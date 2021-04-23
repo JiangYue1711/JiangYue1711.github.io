@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"姜越","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"如何通过在App运行时通过dlopen 和dlsym 加载动态库\n基础篇-使用1.通过Xcode-新建工程-Framework-动态库（LibFramework）\n准备测试代码 新建Class  LibOC\nLibOC.hOC12345int func(int num){printf(\"c-函数调用%d\",num);return num +1;}- (int)func:(int)num;\nLibOC.mOC1234- (int)func:(int)num{NSLog(@\"oc-方法调用%d\", num);return num+1;}\n\n\n2. build (Any Device Arm64)\nProducts下生成Framework后查看包内容找到可执行文件&amp;&amp; LibOC.h，后续使用\n\n3. 新建动态库测试工程 LibDemo\n构建后将第二步骤可执行文件拷贝到.app里面,此时存在两个可执行文件LibDemo、LibFramework\n动态库LibOC.h文件直接引入工程, 用与runtime调试\nBuild Phases  Run Script 添加脚本文件-代码签名\nsh.bashbash12/usr/bin/codesign --force --sign \"$EXPANDED_CODE_SIGN_IDENTITY\"                               \"$BUILT_PRODUCTS_DIR/$TARGET_NAME.app/LibFramework\"\n\n\n4. 添加动态库调用代码\nRunTime\n\nmain.mOC1234567891011121314151617void loadRunTime(){NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@\"LibFramework\" ofType:nil];void *lib_handle = dlopen([bundlePath UTF8String], RTLD_LAZY);if (!lib_handle) {printf(\"%s:loadRunTime没有打开lib:%s\",__FILE__,dlerror());exit(EXIT_FAILURE);}Class class_lib = objc_getClass(\"LibOC\");LibOC *lib = [class_lib new];int num = [lib func:100];printf(\"newNum: %d ---\",num);if (dlclose(lib_handle)!= 0) {printf(\"%s:loadRunTime没有关闭lib:%s\",__FILE__,dlerror());exit(EXIT_FAILURE);}}\n\ndlopen&amp;dlsym\n\nmain.mOC123456789101112131415161718void loadFunc(){    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@\"LibFramework\" ofType:nil];    void *lib_handle = dlopen([bundlePath UTF8String], RTLD_LAZY);    if (!lib_handle) {        NSLog(@\"%s:loadFunc没有打开lib:%s\",__FILE__,dlerror());        exit(EXIT_FAILURE);    }        func_pointer *func = dlsym(lib_handle, \"func\");    if(func){        int num = func(100);        printf(\"newNum: %d ---\",num);    }    if (dlclose(lib_handle)!= 0) {        printf(\"%s:loadFunc没有关闭lib:%s\",__FILE__,dlerror());        exit(EXIT_FAILURE);    }    }   \n4. 调试\n增加调用查看输出是否正确\n\n分析静态库\n程序编译时链接到Mach-o 每次更新需要重新编译，使用LLD 链接\n我们自购件的各类文件等都为静态库方式\n\n动态库\n动态库是运行时加载的库。编译阶段标记为符号未定义，使用DYLD 动态链接\n运行时通过dlopen找到库的路径，通多dlsym获取函数的地址调用\n动态库使用共享缓存来优化启动速度\n动态库的加载分为两种方式\n\n程序启动时绑定\n\n程序第一次使用时绑定\n\n使用MachOView查看可执行文件和动态符号Type第一步 方式一 验证运行时符号绑定\n查看LidDermo–&gt; Symbol table  dlepen &amp; dlsym \n符号为：U_UNDF \n\n加载方式为 NON_LAZY\n\n\n第二步   方式一 验证运行时符号绑定\n创建 Hello(.h&amp;m)   ()\n  Hello.mhm1234#import &lt;Foundation/Foundation.h&gt;@interface Hello : NSObject- (void)say;@end1234567#import \"Hello.h\"@implementation Hello- (void)say{NSLog(@\"hi there again!\\n\");}@end    \n\n\n{% tabbed_codeblock HelloWork.m %}\n      \n          #import \"Hello.h\"\n          int main(int argc, char *argv[]){\n          @autoreleasepool {\n          Hello *boy = [[Hello alloc] init]; [boy say];\n          return 0;   \n          }\n          }\n      \n  {% endtabbed_codeblock %}    \n第三步\n输出可执行文件\nxcrun clang -c hello.m\nxcrun clang -c HelloWork.m\nxcrun clang Hello.o HelloWork.o -Wl,xcrun —show-sdk-path/System/Library/Frameworks/Foundation.framework/Foundation\n\n\n\n\n分别输出  Hello.o、 HelloWork.o、a.out\n\n\nnm 工具查看符号定义情况\n\n\nHello.o\n\n(undefined) external _NSLog\n(undefined) external _OBJC_CLASS_$_NSObject\n(undefined) external _OBJC_METACLASS_$_NSObject\n(undefined) external ___CFConstantStringClassReference\n(undefined) external __objc_empty_cache\n0000000000000000 (__TEXT,__text) non-external -[Hello say]\n0000000000000060 (__DATA,__objc_const) non-external __OBJC_METACLASS_RO_$_Hello\n00000000000000a8 (__DATA,__objc_const) non-external __OBJC_$_INSTANCE_METHODS_Hello\n00000000000000c8 (__DATA,__objc_const) non-external __OBJC_CLASS_RO_$_Hello\n0000000000000110 (__DATA,__objc_data) external _OBJC_METACLASS_$_Hello\n0000000000000138 (__DATA,__objc_data) external _OBJC_CLASS_$_Hello\n\nHelloWork.o        \n\n(undefined) external _OBJC_CLASS_$_Hello\n(undefined) external _objc_alloc_init\n(undefined) external _objc_autoreleasePoolPop\n(undefined) external _objc_autoreleasePoolPush\n(undefined) external _objc_msgSend\n0000000000000000 (__TEXT,__text) external _main\n0000000000000060 (__DATA,__objc_classrefs) non-external _OBJC_CLASSLIST_REFERENCES_$_\n0000000000000070 (__DATA,__objc_selrefs) non-external _OBJC_SELECTOR_REFERENCES_\n\na.out\n\n  (undefined) external _NSLog (from Foundation)\n(undefined) external _OBJC_CLASS_$_NSObject (from libobjc)\n(undefined) external _OBJC_METACLASS_$_NSObject (from libobjc)\n(undefined) external ___CFConstantStringClassReference (from CoreFoundation)\n(undefined) external __objc_empty_cache (from libobjc)\n(undefined) external _objc_alloc_init (from libobjc)\n(undefined) external _objc_autoreleasePoolPop (from libobjc)\n(undefined) external _objc_autoreleasePoolPush (from libobjc)\n(undefined) external _objc_msgSend (from libobjc)\n(undefined) external dyld_stub_binder (from libSystem)\n0000000100000000 (__TEXT,__text) [referenced dynamically] external __mh_execute_header\n0000000100003eb0 (__TEXT,__text) non-external -[Hello say]\n0000000100003ee0 (__TEXT,__text) external _main\n0000000100008020 (__DATA,__objc_const) non-external __OBJC_METACLASS_RO_$_Hello\n0000000100008068 (__DATA,__objc_const) non-external __OBJC_$_INSTANCE_METHODS_Hello\n0000000100008088 (__DATA,__objc_const) non-external __OBJC_CLASS_RO_$_Hello\n00000001000080e0 (__DATA,__objc_data) external _OBJC_METACLASS_$_Hello\n0000000100008108 (__DATA,__objc_data) external _OBJC_CLASS_$_Hello\n0000000100008130 (__DATA,__data) non-external __dyld_private\n第四步\n(undefined) external   标识未定义 菲私有\n_OBJC_CLASS_$_Hello  标识OC -&gt; Hello\nexternal _main     标识处理地址00，位置在text段\nfrom Foundation  标识未定义符号属于 哪个 lib\n\n第五步\nxcrun otool -L a.out\n /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 1770.255.0)\n/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1292.60.1)\n/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 1770.255.0)\n/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\n\n输出了各个系统库的来源。正式我们三步使用的路径\n总结\ndylib 格式代表动态链接，在程序运行时才会链接，编译时不会链接到Mach-o，也不会增加包大小。不用更新程序就可以执行新库\n关于共享缓存(/var/db/dyld/)，苹果维护了一块内存区域，存储了加载过的动态库。程序运行时，先会查找共享缓存，App虚拟进程地址空间会优先映射共享缓存，提高启动速度\ndyld 根据 undefined 找到 dylib。通过共享缓存递归lib\n绑定符号与地址\n\n","dateCreated":"2019-12-21T16:49:29+08:00","dateModified":"2021-04-23T16:25:12+08:00","datePublished":"2019-12-21T16:49:29+08:00","description":"如何通过在App运行时通过dlopen 和dlsym 加载动态库","headline":"dlopen-dlsym","image":["dlopen-dlsym.png","dlopen-dlsym.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://jiangyue.club/2019/12/21/dlopen-dlsym/"},"publisher":{"@type":"Organization","name":"姜越","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"http://jiangyue.club/2019/12/21/dlopen-dlsym/","keywords":"dlopen, dlsym, 静态库, 动态库","thumbnailUrl":"dlopen-dlsym.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"姜越","sameAs":[],"image":"header.jpg"},"articleBody":"如何通过在App运行时通过dlopen 和dlsym 加载动态库\n基础篇-使用1.通过Xcode-新建工程-Framework-动态库（LibFramework）\n准备测试代码 新建Class  LibOC\nLibOC.hOC12345int func(int num){printf(\"c-函数调用%d\",num);return num +1;}- (int)func:(int)num;\nLibOC.mOC1234- (int)func:(int)num{NSLog(@\"oc-方法调用%d\", num);return num+1;}\n\n\n2. build (Any Device Arm64)\nProducts下生成Framework后查看包内容找到可执行文件&amp;&amp; LibOC.h，后续使用\n\n3. 新建动态库测试工程 LibDemo\n构建后将第二步骤可执行文件拷贝到.app里面,此时存在两个可执行文件LibDemo、LibFramework\n动态库LibOC.h文件直接引入工程, 用与runtime调试\nBuild Phases  Run Script 添加脚本文件-代码签名\nsh.bashbash12/usr/bin/codesign --force --sign \"$EXPANDED_CODE_SIGN_IDENTITY\"                               \"$BUILT_PRODUCTS_DIR/$TARGET_NAME.app/LibFramework\"\n\n\n4. 添加动态库调用代码\nRunTime\n\nmain.mOC1234567891011121314151617void loadRunTime(){NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@\"LibFramework\" ofType:nil];void *lib_handle = dlopen([bundlePath UTF8String], RTLD_LAZY);if (!lib_handle) {printf(\"%s:loadRunTime没有打开lib:%s\",__FILE__,dlerror());exit(EXIT_FAILURE);}Class class_lib = objc_getClass(\"LibOC\");LibOC *lib = [class_lib new];int num = [lib func:100];printf(\"newNum: %d ---\",num);if (dlclose(lib_handle)!= 0) {printf(\"%s:loadRunTime没有关闭lib:%s\",__FILE__,dlerror());exit(EXIT_FAILURE);}}\n\ndlopen&amp;dlsym\n\nmain.mOC123456789101112131415161718void loadFunc(){    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@\"LibFramework\" ofType:nil];    void *lib_handle = dlopen([bundlePath UTF8String], RTLD_LAZY);    if (!lib_handle) {        NSLog(@\"%s:loadFunc没有打开lib:%s\",__FILE__,dlerror());        exit(EXIT_FAILURE);    }        func_pointer *func = dlsym(lib_handle, \"func\");    if(func){        int num = func(100);        printf(\"newNum: %d ---\",num);    }    if (dlclose(lib_handle)!= 0) {        printf(\"%s:loadFunc没有关闭lib:%s\",__FILE__,dlerror());        exit(EXIT_FAILURE);    }    }   \n4. 调试\n增加调用查看输出是否正确\n\n分析静态库\n程序编译时链接到Mach-o 每次更新需要重新编译，使用LLD 链接\n我们自购件的各类文件等都为静态库方式\n\n动态库\n动态库是运行时加载的库。编译阶段标记为符号未定义，使用DYLD 动态链接\n运行时通过dlopen找到库的路径，通多dlsym获取函数的地址调用\n动态库使用共享缓存来优化启动速度\n动态库的加载分为两种方式\n\n程序启动时绑定\n\n程序第一次使用时绑定\n\n使用MachOView查看可执行文件和动态符号Type第一步 方式一 验证运行时符号绑定\n查看LidDermo–&gt; Symbol table  dlepen &amp; dlsym \n符号为：U_UNDF \n\n加载方式为 NON_LAZY\n\n\n第二步   方式一 验证运行时符号绑定\n创建 Hello(.h&amp;m)   ()\n  Hello.mhm1234#import &lt;Foundation/Foundation.h&gt;@interface Hello : NSObject- (void)say;@end1234567#import \"Hello.h\"@implementation Hello- (void)say{NSLog(@\"hi there again!\\n\");}@end    \n\n\n{% tabbed_codeblock HelloWork.m %}\n      \n          #import \"Hello.h\"\n          int main(int argc, char *argv[]){\n          @autoreleasepool {\n          Hello *boy = [[Hello alloc] init]; [boy say];\n          return 0;   \n          }\n          }\n      \n  {% endtabbed_codeblock %}    \n第三步\n输出可执行文件\nxcrun clang -c hello.m\nxcrun clang -c HelloWork.m\nxcrun clang Hello.o HelloWork.o -Wl,xcrun —show-sdk-path/System/Library/Frameworks/Foundation.framework/Foundation\n\n\n\n\n分别输出  Hello.o、 HelloWork.o、a.out\n\n\nnm 工具查看符号定义情况\n\n\nHello.o\n\n(undefined) external _NSLog\n(undefined) external _OBJC_CLASS_$_NSObject\n(undefined) external _OBJC_METACLASS_$_NSObject\n(undefined) external ___CFConstantStringClassReference\n(undefined) external __objc_empty_cache\n0000000000000000 (__TEXT,__text) non-external -[Hello say]\n0000000000000060 (__DATA,__objc_const) non-external __OBJC_METACLASS_RO_$_Hello\n00000000000000a8 (__DATA,__objc_const) non-external __OBJC_$_INSTANCE_METHODS_Hello\n00000000000000c8 (__DATA,__objc_const) non-external __OBJC_CLASS_RO_$_Hello\n0000000000000110 (__DATA,__objc_data) external _OBJC_METACLASS_$_Hello\n0000000000000138 (__DATA,__objc_data) external _OBJC_CLASS_$_Hello\n\nHelloWork.o        \n\n(undefined) external _OBJC_CLASS_$_Hello\n(undefined) external _objc_alloc_init\n(undefined) external _objc_autoreleasePoolPop\n(undefined) external _objc_autoreleasePoolPush\n(undefined) external _objc_msgSend\n0000000000000000 (__TEXT,__text) external _main\n0000000000000060 (__DATA,__objc_classrefs) non-external _OBJC_CLASSLIST_REFERENCES_$_\n0000000000000070 (__DATA,__objc_selrefs) non-external _OBJC_SELECTOR_REFERENCES_\n\na.out\n\n  (undefined) external _NSLog (from Foundation)\n(undefined) external _OBJC_CLASS_$_NSObject (from libobjc)\n(undefined) external _OBJC_METACLASS_$_NSObject (from libobjc)\n(undefined) external ___CFConstantStringClassReference (from CoreFoundation)\n(undefined) external __objc_empty_cache (from libobjc)\n(undefined) external _objc_alloc_init (from libobjc)\n(undefined) external _objc_autoreleasePoolPop (from libobjc)\n(undefined) external _objc_autoreleasePoolPush (from libobjc)\n(undefined) external _objc_msgSend (from libobjc)\n(undefined) external dyld_stub_binder (from libSystem)\n0000000100000000 (__TEXT,__text) [referenced dynamically] external __mh_execute_header\n0000000100003eb0 (__TEXT,__text) non-external -[Hello say]\n0000000100003ee0 (__TEXT,__text) external _main\n0000000100008020 (__DATA,__objc_const) non-external __OBJC_METACLASS_RO_$_Hello\n0000000100008068 (__DATA,__objc_const) non-external __OBJC_$_INSTANCE_METHODS_Hello\n0000000100008088 (__DATA,__objc_const) non-external __OBJC_CLASS_RO_$_Hello\n00000001000080e0 (__DATA,__objc_data) external _OBJC_METACLASS_$_Hello\n0000000100008108 (__DATA,__objc_data) external _OBJC_CLASS_$_Hello\n0000000100008130 (__DATA,__data) non-external __dyld_private\n第四步\n(undefined) external   标识未定义 菲私有\n_OBJC_CLASS_$_Hello  标识OC -&gt; Hello\nexternal _main     标识处理地址00，位置在text段\nfrom Foundation  标识未定义符号属于 哪个 lib\n\n第五步\nxcrun otool -L a.out\n /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 1770.255.0)\n/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1292.60.1)\n/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 1770.255.0)\n/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\n\n输出了各个系统库的来源。正式我们三步使用的路径\n总结\ndylib 格式代表动态链接，在程序运行时才会链接，编译时不会链接到Mach-o，也不会增加包大小。不用更新程序就可以执行新库\n关于共享缓存(/var/db/dyld/)，苹果维护了一块内存区域，存储了加载过的动态库。程序运行时，先会查找共享缓存，App虚拟进程地址空间会优先映射共享缓存，提高启动速度\ndyld 根据 undefined 找到 dylib。通过共享缓存递归lib\n绑定符号与地址\n\n","dateCreated":"2019-12-21T16:49:29+08:00","dateModified":"2021-04-23T16:25:12+08:00","datePublished":"2019-12-21T16:49:29+08:00","description":"如何通过在App运行时通过dlopen 和dlsym 加载动态库","headline":"dlopen-dlsym","image":["dlopen-dlsym.png","dlopen-dlsym.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://jiangyue.club/2019/12/21/dlopen-dlsym/"},"publisher":{"@type":"Organization","name":"姜越","sameAs":[],"image":"header.jpg","logo":{"@type":"ImageObject","url":"header.jpg"}},"url":"http://jiangyue.club/2019/12/21/dlopen-dlsym/","keywords":"dlopen, dlsym, 静态库, 动态库","thumbnailUrl":"dlopen-dlsym.png"}</script>
     <meta name="description" content="如何通过在App运行时通过dlopen 和dlsym 加载动态库">
 <meta name="keywords" content="dlopen,dlsym,静态库,动态库">
 <meta property="og:type" content="blog">
@@ -34,6 +34,8 @@
     
         
     
+    
+        <meta property="og:image" content="http://jiangyue.club/assets/images/header.jpg"/>
     
     
         <meta property="og:image" content="http://jiangyue.club/2019/12/21/dlopen-dlsym/dlopen-dlsym.png"/>
@@ -62,8 +64,12 @@
 
 
     
+        
+            
+        
+    
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="6">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="/" aria-label>
@@ -75,6 +81,8 @@
             <a class="header-right-picture " href="#about" aria-label="打开链接: /#about">
         
         
+            <img class="header-picture" src="/assets/images/header.jpg" alt="作者的图片">
+        
         </a>
     
 </header>
@@ -82,8 +90,23 @@
             <!-- Define author's picture -->
 
 
-<nav id="sidebar" data-behavior="4">
+
+        
+    
+
+<nav id="sidebar" data-behavior="6">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about" aria-label="阅读有关作者的更多信息">
+                    <img class="sidebar-profile-picture" src="/assets/images/header.jpg" alt="作者的图片">
+                </a>
+                <h4 class="sidebar-profile-name">姜越</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>把心放平 把心放正</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -128,86 +151,6 @@
                     </a>
             </li>
             
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="#about" rel="noopener" title="关于">
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">关于</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google Plus</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="/mailto" rel="noopener" title="邮箱">
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">邮箱</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="/atom.xml" rel="noopener" title="RSS">
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
         </ul>
         
     </div>
@@ -216,7 +159,7 @@
             
         <div class="post-header-cover
                     text-left
-                    post-header-cover--partial" style="background-image:url('/2019/12/21/dlopen-dlsym/dlopen-dlsym.png');" data-behavior="4">
+                    post-header-cover--partial" style="background-image:url('/2019/12/21/dlopen-dlsym/dlopen-dlsym.png');" data-behavior="6">
             
                 <div class="post-header main-content-wrap text-left">
     
@@ -246,7 +189,7 @@
             
         </div>
 
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="6"
                  class="hasCover
                         hasCoverMetaIn
                         ">
@@ -503,7 +446,7 @@
 
             </div>
             
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="6">
                     <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
@@ -573,7 +516,7 @@
 
                 </div>
                 
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <div id="share-options-bar" class="share-options-bar" data-behavior="6">
         <i id="btn-close-shareoptions" class="fa fa-times"></i>
         <ul class="share-options">
             
@@ -610,25 +553,37 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
         
+            <img id="about-card-picture" src="/assets/images/header.jpg" alt="作者的图片">
+        
             <h4 id="about-card-name">姜越</h4>
         
-            <div id="about-card-bio"><p>author.bio</p>
+            <div id="about-card-bio"><p>把心放平 把心放正</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
                 <br>
-                <p>author.job</p>
+                <p>乐视网iOS</p>
 
             </div>
         
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                北京
+            </div>
         
     </div>
 </div>

@@ -51,28 +51,6 @@
   </entry>
   
   <entry>
-    <title>ranquilpeak 调整篇</title>
-    <link href="http://jiangyue.club/2017/05/19/ranquilpeak-%E8%B0%83%E6%95%B4%E7%AF%87/"/>
-    <id>http://jiangyue.club/2017/05/19/ranquilpeak-调整篇/</id>
-    <published>2017-05-19T08:49:29.000Z</published>
-    <updated>2021-04-15T08:44:18.682Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>Tranquilpeak</strong> 主题美观简洁，支持多种样式自定义修改,具体参考<a href="https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak/blob/master/docs/user.md" target="_blank" rel="noopener">官方用户文档</a> 由于Tranquilpeak 和Hexo 存在版本差异和兼容性问题，在配置主题和<a href="2017/05/19/tranquilpea-书写篇/">书写文章</a>时会可能会存在问题<br><a id="more"></a></p><h5 id="1-主题语言修改"><a href="#1-主题语言修改" class="headerlink" title="1. 主题语言修改"></a>1. 主题语言修改</h5><ul><li>打开博客_config.yml配置文件修改language: zh-cn       <div class="alert warning no-icon"><p> <strong>themes/tranquilpeak/languages</strong><br>注意和支持的语言文件名称是否一致区分大小写</p></div></li></ul><h5 id="2-修改关于提示页面信息"><a href="#2-修改关于提示页面信息" class="headerlink" title="2. 修改关于提示页面信息"></a>2. 修改关于提示页面信息</h5><ul><li><p>进入 themes/tranquilpeak/languages 选择语言文件</p><div class="alert info no-icon"><p>你的个人简介 (支持 Markdown 和 HTML 语法)   </p></div><pre><code>author:bio: &quot;Markdown/HTML&quot;#你的工作简介job: &quot;Markdown/HTML&quot;</code></pre></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;Tranquilpeak&lt;/strong&gt; 主题美观简洁，支持多种样式自定义修改,具体参考&lt;a href=&quot;https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak/blob/master/docs/user.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;官方用户文档&lt;/a&gt; 由于Tranquilpeak 和Hexo 存在版本差异和兼容性问题，在配置主题和&lt;a href=&quot;2017/05/19/tranquilpea-书写篇/&quot;&gt;书写文章&lt;/a&gt;时会可能会存在问题&lt;br&gt;
-    
-    </summary>
-    
-      <category term="tranquilpeak" scheme="http://jiangyue.club/categories/tranquilpeak/"/>
-    
-    
-      <category term="tranquilpeak" scheme="http://jiangyue.club/tags/tranquilpeak/"/>
-    
-  </entry>
-  
-  <entry>
     <title>tranquilpea 书写篇</title>
     <link href="http://jiangyue.club/2017/05/19/tranquilpea-%E4%B9%A6%E5%86%99%E7%AF%87/"/>
     <id>http://jiangyue.club/2017/05/19/tranquilpea-书写篇/</id>
@@ -84,6 +62,28 @@
     <summary type="html">
     
       &lt;p&gt;&lt;a href=&quot;http://louisbarranqueiro.github.io/hexo-theme-tranquilpeak/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Tranquilpeak&lt;/a&gt;主题美观简洁，支持多种方式展示图片，适合图文并茂的博客。支持视频播放、字体元素、颜色、代码着色等功能&lt;br&gt;
+    
+    </summary>
+    
+      <category term="tranquilpeak" scheme="http://jiangyue.club/categories/tranquilpeak/"/>
+    
+    
+      <category term="tranquilpeak" scheme="http://jiangyue.club/tags/tranquilpeak/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ranquilpeak 调整篇</title>
+    <link href="http://jiangyue.club/2017/05/19/ranquilpeak-%E8%B0%83%E6%95%B4%E7%AF%87/"/>
+    <id>http://jiangyue.club/2017/05/19/ranquilpeak-调整篇/</id>
+    <published>2017-05-19T08:49:29.000Z</published>
+    <updated>2021-04-15T08:44:18.682Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>Tranquilpeak</strong> 主题美观简洁，支持多种样式自定义修改,具体参考<a href="https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak/blob/master/docs/user.md" target="_blank" rel="noopener">官方用户文档</a> 由于Tranquilpeak 和Hexo 存在版本差异和兼容性问题，在配置主题和<a href="2017/05/19/tranquilpea-书写篇/">书写文章</a>时会可能会存在问题<br><a id="more"></a></p><h5 id="1-主题语言修改"><a href="#1-主题语言修改" class="headerlink" title="1. 主题语言修改"></a>1. 主题语言修改</h5><ul><li>打开博客_config.yml配置文件修改language: zh-cn       <div class="alert warning no-icon"><p> <strong>themes/tranquilpeak/languages</strong><br>注意和支持的语言文件名称是否一致区分大小写</p></div></li></ul><h5 id="2-修改关于提示页面信息"><a href="#2-修改关于提示页面信息" class="headerlink" title="2. 修改关于提示页面信息"></a>2. 修改关于提示页面信息</h5><ul><li><p>进入 themes/tranquilpeak/languages 选择语言文件</p><div class="alert info no-icon"><p>你的个人简介 (支持 Markdown 和 HTML 语法)   </p></div><pre><code>author:bio: &quot;Markdown/HTML&quot;#你的工作简介job: &quot;Markdown/HTML&quot;</code></pre></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;Tranquilpeak&lt;/strong&gt; 主题美观简洁，支持多种样式自定义修改,具体参考&lt;a href=&quot;https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak/blob/master/docs/user.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;官方用户文档&lt;/a&gt; 由于Tranquilpeak 和Hexo 存在版本差异和兼容性问题，在配置主题和&lt;a href=&quot;2017/05/19/tranquilpea-书写篇/&quot;&gt;书写文章&lt;/a&gt;时会可能会存在问题&lt;br&gt;
     
     </summary>
     

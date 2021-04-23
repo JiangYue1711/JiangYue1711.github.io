@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="姜越的博客">
+    <title>分类: dlsym - 姜越的博客</title>
+    <meta name="author" content="姜越">
+    
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{}</script>
+    <meta name="description" content="把心放平 把心放正">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="姜越的博客">
+<meta property="og:url" content="http://jiangyue.club/categories/dlopen/dlsym/index.html">
+<meta property="og:site_name" content="姜越的博客">
+<meta property="og:description" content="把心放平 把心放正">
+<meta property="og:locale" content="zh-cn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="姜越的博客">
+<meta name="twitter:description" content="把心放平 把心放正">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-rd8vznonausjfisrqbhzsacsvmvxbieuja1vaccjpl6bkxjbezeejwydivpd.min.css">
+    <!--STYLES END-->
+    
+
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="1">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            姜越的博客
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="打开链接: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="1">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" rel="noopener" title="首页">
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" rel="noopener" title="分类">
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" rel="noopener" title="标签">
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" rel="noopener" title="归档">
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" rel="noopener" title="搜索">
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜索</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" rel="noopener" title="关于">
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
+                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Google Plus</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/mailto" rel="noopener" title="邮箱">
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">邮箱</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" rel="noopener" title="RSS">
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="1"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+    <section class="postShorten-group main-content-wrap">
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-left">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a class="link-unstyled" href="/2019/12/21/dlopen-dlsym/" aria-label=": dlopen-dlsym">
+                            dlopen-dlsym
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2019-12-21T16:49:29+08:00">
+	
+		    12月 21, 2019
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/dlopen/">dlopen</a>, <a class="category-link" href="/categories/dlopen/dlsym/">dlsym</a>, <a class="category-link" href="/categories/dlopen/dlsym/静态库/">静态库</a>, <a class="category-link" href="/categories/dlopen/dlsym/静态库/动态库/">动态库</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>如何通过在App运行时通过dlopen 和dlsym 加载动态库<br>
+                    
+                        <a href="/2019/12/21/dlopen-dlsym/" class="postShorten-excerpt_link link" aria-label=": dlopen-dlsym">
+                            阅读全文
+                        </a>
+                        
+                    
+                </p></div>
+            
+        </div>
+        
+            <a href="/2019/12/21/dlopen-dlsym/" aria-label=": dlopen-dlsym">
+                <div class="postShorten-thumbnailimg">
+                    <img alt src="http://jiangyue.club/2019/12/21/dlopen-dlsym/dlopen-dlsym.png">
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    <div class="pagination-bar">
+    <ul class="pagination">
+        
+        
+        <li class="pagination-number">第 1 页 共 1 页</li>
+    </ul>
+</div>
+
+</section>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2021 姜越. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">姜越</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>author.job</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">没有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://jiangyue.club/2017/05/19/ranquilpeak-调整篇/" aria-label=": ranquilpeak 调整篇">
+                            <img class="media-image" src="http://jiangyue.club/2017/05/19/ranquilpeak-调整篇/thumbnail_image-17051901.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://jiangyue.club/2017/05/19/ranquilpeak-调整篇/" aria-label=": ranquilpeak 调整篇">
+                            <h3 class="media-heading">ranquilpeak 调整篇</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2017年5月19日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><strong>Tranquilpeak</strong> 主题美观简洁，支持多种样式自定义修改,具体参考<a href="https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak/blob/master/docs/user.md" target="_blank" rel="noopener">官方用户文档</a> 由于Tranquilpeak 和Hexo 存在版本差异和兼容性问题，在配置主题和<a href="2017/05/19/tranquilpea-书写篇/">书写文章</a>时会可能会存在问题<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://jiangyue.club/2017/05/19/tranquilpea-书写篇/" aria-label=": tranquilpea 书写篇">
+                            <img class="media-image" src="http://jiangyue.club/2017/05/19/tranquilpea-书写篇/city-750.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://jiangyue.club/2017/05/19/tranquilpea-书写篇/" aria-label=": tranquilpea 书写篇">
+                            <h3 class="media-heading">tranquilpea 书写篇</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2017年5月19日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><a href="http://louisbarranqueiro.github.io/hexo-theme-tranquilpeak/" target="_blank" rel="noopener">Tranquilpeak</a>主题美观简洁，支持多种方式展示图片，适合图文并茂的博客。支持视频播放、字体元素、颜色、代码着色等功能<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="http://jiangyue.club/2019/12/21/dlopen-dlsym/" aria-label=": dlopen-dlsym">
+                            <img class="media-image" src="http://jiangyue.club/2019/12/21/dlopen-dlsym/dlopen-dlsym.png" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="http://jiangyue.club/2019/12/21/dlopen-dlsym/" aria-label=": dlopen-dlsym">
+                            <h3 class="media-heading">dlopen-dlsym</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2019年12月21日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>如何通过在App运行时通过dlopen 和dlsym 加载动态库<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="没有找到文章" data-message-one="找到 1 篇文章" data-message-other="找到 {n} 篇文章">
+                找到 3 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-qp3iiehkwn9icokgrkw6fjcd4bn4qbkgmfy4moqs6qnkwtfuferwwacvir0q.min.js"></script>
+<!--SCRIPTS END-->
+
+
+
+
+    <script src="/assets/js/moment-with-locales.js"></script>
+    <script src="/assets/js/algoliasearch.js"></script>
+    <script>
+      var algoliaClient = algoliasearch('93WI2TCHHJ', '1036bc3eb4e852e6b82d5e45ed9d8273');
+      var algoliaIndex = algoliaClient.initIndex('my-hexo-blog');
+    </script>
+
+
+    </body>
+</html>

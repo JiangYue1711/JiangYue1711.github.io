@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"姜越","sameAs":[],"image":"header.jpg"},"articleBody":"\n单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务\n多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行\n多路径执行任务就是我们说的多线程\nGCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范\n\n\nGCD\n\nDispatch Group: 使用队列组管理队列\ndispatch_group_async：管理队列组任务\ndispatch_group_notify： 全部任务处理结束回调\ndispatch_group_wait：   通过时间节点获取任务执行结果\n\ndispatch_set_target_queue: 优先级变更，Serial Queue 并行时，可以指定某个* target——queue,打到串行的目的\n\ndispatch_after：指定某个时间节点后执行任务\n\ndispatch_barrier_async：通过barrier可以将并发任务分段执行\n\ndispatch_apply： 指定任务次数\n\ndispatch_suspend/resume：可以对队列任务挂起和恢复\n\nDispatch Semaphore：通过信号可以细粒度控制队列，排他控制\n\ndispatch_once: 只执行一次的处理，主要是保证了线程安全\n\n\nQueue\n\n\n名称\n种类\n描述\n\n\n\n\nMain  Queue\nSerial\n主线程串行执行\n\n\nGlobal Queue (High)\nConcurrent\n高优先级\n\n\nGlobal Queue (Default)\nConcurrent\n默认优先级\n\n\nGlobal Queue (Low)\nConcurrent\n高优先级\n\n\nGlobal Queue (Background)\nConcurrent\n后台优先级\n\n\n\n库GCD 是基于IOS 和XNU 内核级别的实现，性能是最优秀的，GCD使用起来要比  pthreads 和 NSthread 更加方便。API 全部包含在libdispatch库中的C语言函数中， Dispatch Queue 使用 struct 和链表实现了队列 FIFO|:————-      |:—————:|| libdispatch        | Dispatch Queue ||Libc Pthrads   | prhread_workqueue|| XNU 内核| Concurrent |\n思考\n进程和线程的区别 进程：App 启动时，会创建一个进程，并且分配虚拟地址空间，进程间相互独立 线程：建立在进程的基础上的，可以有多条线程，相互通信 每创建一个线程会在进车中分配虚拟空间（分配堆栈） ,队列大致分为串行队列 并发队列。串行队列不具有创建多个新线程的能力\n\n为什么UI要在主线程上更新\n 不恰当的使用多线程技术  会造成线程长驻，并发会造成过多线程被创建。线程的创建切换会涉及到内存的分配，寄存器的更新，上下文的切换，会对CPU造成过多开销，影响了整体的性能，线程长驻会占用有限的线程资源，浪费了多核优势。对线程的合理使用能起到好的效果，反过来不合理的造成糟糕的结果。出于性能与稳定性考虑，选择使用单一线程来保证这些基础库的稳定可用\n\n\n","dateCreated":"2020-01-11T13:40:14+08:00","dateModified":"2021-04-26T14:48:38+08:00","datePublished":"2020-01-11T13:40:14+08:00","description":"\n单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务\n多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行\n多路径执行任务就是我们说的多线程\nGCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范\n","headline":"GCD","image":["GCD.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://jiangyue.club/2020/01/11/GCD/"},"publisher":{"@type":"Organization","name":"姜越","sameAs":[],"image":"header.jpg","logo":{"@type":"ImageObject","url":"header.jpg"}},"url":"http://jiangyue.club/2020/01/11/GCD/","keywords":"GCD","thumbnailUrl":"GCD.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"姜越","sameAs":[],"image":"header.jpg"},"articleBody":"\n单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务\n多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行\n多路径执行任务就是我们说的多线程\nGCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范\n\n\nGCD\n\nDispatch Group: 使用队列组管理队列\ndispatch_group_async：管理队列组任务\ndispatch_group_notify： 全部任务处理结束回调\ndispatch_group_wait：   通过时间节点获取任务执行结果\n\ndispatch_set_target_queue: 优先级变更，Serial Queue 并行时，可以指定某个* target——queue,打到串行的目的\n\ndispatch_after：指定某个时间节点后执行任务\n\ndispatch_barrier_async：通过barrier可以将并发任务分段执行\n\ndispatch_apply： 指定任务次数\n\ndispatch_suspend/resume：可以对队列任务挂起和恢复\n\nDispatch Semaphore：通过信号可以细粒度控制队列，排他控制\n\ndispatch_once: 只执行一次的处理，主要是保证了线程安全\n\n\nQueue\n\n\n名称\n种类\n描述\n\n\n\n\nMain  Queue\nSerial\n主线程串行执行\n\n\nGlobal Queue (High)\nConcurrent\n高优先级\n\n\nGlobal Queue (Default)\nConcurrent\n默认优先级\n\n\nGlobal Queue (Low)\nConcurrent\n高优先级\n\n\nGlobal Queue (Background)\nConcurrent\n后台优先级\n\n\n\n库GCD 是基于IOS 和XNU 内核级别的实现，性能是最优秀的，GCD使用起来要比  pthreads 和 NSthread 更加方便。API 全部包含在libdispatch库中的C语言函数中， Dispatch Queue 使用 struct 和链表实现了队列 FIFO \n\n\n\n\n\n\n\n\n\nlibdispatch\nDispatch Queue\n\n\nLibc Pthrads\nprhread_workqueue\n\n\nXNU 内核\nConcurrent\n\n\n\n思考\n进程和线程的区别 进程：App 启动时，会创建一个进程，并且分配虚拟地址空间，进程间相互独立 线程：建立在进程的基础上的，可以有多条线程，相互通信 每创建一个线程会在进车中分配虚拟空间（分配堆栈） ,队列大致分为串行队列 并发队列。串行队列不具有创建多个新线程的能力\n\n为什么UI要在主线程上更新\n 不恰当的使用多线程技术  会造成线程长驻，并发会造成过多线程被创建。线程的创建切换会涉及到内存的分配，寄存器的更新，上下文的切换，会对CPU造成过多开销，影响了整体的性能，线程长驻会占用有限的线程资源，浪费了多核优势。对线程的合理使用能起到好的效果，反过来不合理的造成糟糕的结果。出于性能与稳定性考虑，选择使用单一线程来保证这些基础库的稳定可用\n\n\n","dateCreated":"2020-01-11T13:40:14+08:00","dateModified":"2021-04-26T14:52:12+08:00","datePublished":"2020-01-11T13:40:14+08:00","description":"\n单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务\n多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行\n多路径执行任务就是我们说的多线程\nGCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范\n","headline":"GCD","image":["GCD.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://jiangyue.club/2020/01/11/GCD/"},"publisher":{"@type":"Organization","name":"姜越","sameAs":[],"image":"header.jpg","logo":{"@type":"ImageObject","url":"header.jpg"}},"url":"http://jiangyue.club/2020/01/11/GCD/","keywords":"GCD","thumbnailUrl":"GCD.png"}</script>
     <meta name="description" content="单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务 多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行 多路径执行任务就是我们说的多线程 GCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范">
 <meta name="keywords" content="GCD">
 <meta property="og:type" content="blog">
@@ -27,7 +27,7 @@
 <meta property="og:description" content="单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务 多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行 多路径执行任务就是我们说的多线程 GCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范">
 <meta property="og:locale" content="zh-cn">
 <meta property="og:image" content="http://jiangyue.club/2020/01/11/GCD/GCD.png">
-<meta property="og:updated_time" content="2021-04-26T06:48:38.438Z">
+<meta property="og:updated_time" content="2021-04-26T06:52:12.124Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GCD">
 <meta name="twitter:description" content="单核CPU上，单路径执行任务，即命令是一条一条执行。在同个时间段内，只能有一个任务在执行，等待完成后才能执行下一个任务 多核CPU上，多路径执行任务，即有多条路径在并行执行任务。不同的任务可以在不同的路径上同时执行 多路径执行任务就是我们说的多线程 GCD 是多线程编程技术的通用接口，使用简洁的方式实现了复杂的多线程编程规范">
@@ -257,7 +257,29 @@
 </tr>
 </tbody>
 </table>
-<h6 id="库"><a href="#库" class="headerlink" title="库"></a>库</h6><p>GCD 是基于IOS 和XNU 内核级别的实现，性能是最优秀的，GCD使用起来要比  pthreads 和 NSthread 更加方便。API 全部包含在libdispatch库中的C语言函数中， Dispatch Queue 使用 struct 和链表实现了队列 FIFO<br>|:————-      |:—————:|<br>| libdispatch        | Dispatch Queue |<br>|Libc Pthrads   | prhread_workqueue|<br>| XNU 内核| Concurrent |</p>
+<h6 id="库"><a href="#库" class="headerlink" title="库"></a>库</h6><p>GCD 是基于IOS 和XNU 内核级别的实现，性能是最优秀的，GCD使用起来要比  pthreads 和 NSthread 更加方便。API 全部包含在libdispatch库中的C语言函数中， Dispatch Queue 使用 struct 和链表实现了队列 FIFO </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">libdispatch</td>
+<td style="text-align:center">Dispatch Queue</td>
+</tr>
+<tr>
+<td style="text-align:left">Libc Pthrads</td>
+<td style="text-align:center">prhread_workqueue</td>
+</tr>
+<tr>
+<td style="text-align:left">XNU 内核</td>
+<td style="text-align:center">Concurrent</td>
+</tr>
+</tbody>
+</table>
 <h5 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h5><ol>
 <li><p>进程和线程的区别<br> 进程：App 启动时，会创建一个进程，并且分配虚拟地址空间，进程间相互独立<br> 线程：建立在进程的基础上的，可以有多条线程，相互通信 每创建一个线程会在进车中分配虚拟空间（分配堆栈） ,队列大致分为串行队列 并发队列。串行队列不具有创建多个新线程的能力</p>
 </li>
